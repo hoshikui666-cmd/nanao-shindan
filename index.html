@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>七緒の眼識診断</title>
+<meta name="description" content="あんたが、気づかないうちにこぼしているものは？ 8つの質問で視る、七緒の眼識診断。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#0f1626;
+    --ai:#1d2a45;
+    --ai-mid:#2d4470;
+    --kinari:#f3ede0;
+    --dim:#a59f92;
+    --line:rgba(214,182,128,.28);
+    --gold:#d6b680;
+    --panel:rgba(29,42,69,.62);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    color:var(--kinari);
+    background:
+      radial-gradient(ellipse 70% 38% at 50% 0%, rgba(214,170,98,.16), transparent 70%),
+      radial-gradient(ellipse 80% 40% at 50% 110%, rgba(45,68,112,.55), transparent 70%),
+      linear-gradient(180deg,#141d31,var(--night) 55%,#0b101c);
+    background-attachment:fixed;
+    font-family:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+    overflow-x:hidden;
+  }
+  /* 格子 */
+  body::before{ content:""; position:fixed; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 3px, transparent 3px 46px); }
+  /* 上ののれんと灯り */
+  .noren{ position:relative; padding:18px 16px 0; }
+  .noren .rod{ height:4px; background:#5a4630; border-radius:2px; max-width:520px; margin:0 auto; }
+  .noren .cloth{ display:flex; gap:4px; max-width:480px; margin:0 auto; }
+  .noren .cloth div{ flex:1; height:96px; background:linear-gradient(180deg,#2c4372,#223659); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 18px rgba(0,0,0,.35); }
+  .shichi{ width:58px; height:58px; border-radius:50%; border:2.5px solid var(--kinari); color:var(--kinari); display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:24px; }
+  .lamp{ width:10px; height:10px; margin:22px auto 0; border-radius:50%; background:var(--gold); box-shadow:0 0 18px 8px rgba(214,170,98,.45); animation:flicker 3.2s ease-in-out infinite; }
+  @keyframes flicker{ 0%,100%{opacity:.85; transform:scale(1);} 45%{opacity:1; transform:scale(1.08);} 60%{opacity:.7;} }
+  .wrap{ position:relative; max-width:560px; margin:0 auto; padding:26px 16px 64px; }
+  .screen{ display:none; animation:fade .6s ease; }
+  .screen.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+  h1{ font-family:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif; font-weight:700; font-size:27px; letter-spacing:.16em; text-align:center; margin:0 0 10px; color:var(--kinari); text-shadow:0 0 18px rgba(214,170,98,.25); }
+  .subtitle{ text-align:center; font-family:'Shippori Mincho',serif; font-size:15px; letter-spacing:.06em; color:var(--gold); margin:0 0 30px; word-break:auto-phrase; }
+  .lead{ font-family:'Shippori Mincho',serif; font-size:16px; line-height:2.1; text-align:center; margin:0 0 34px; }
+  .center{ text-align:center; }
+
+  button{ font-family:inherit; cursor:pointer; color:inherit; -webkit-tap-highlight-color:transparent; }
+  .btn-main{ display:inline-block; font-family:'Shippori Mincho',serif; font-size:16px; font-weight:700; letter-spacing:.16em; padding:15px 42px; border:1px solid var(--gold); background:rgba(214,182,128,.12); color:var(--kinari); text-decoration:none; transition:transform .15s ease, background .2s ease, box-shadow .2s ease; }
+  .btn-main:hover{ background:rgba(214,182,128,.22); box-shadow:0 0 22px rgba(214,170,98,.3); }
+  .btn-main:active{ transform:translateY(1px); }
+  .btn-main[aria-disabled="true"]{ opacity:.5; pointer-events:none; }
+  .btn-ghost{ background:transparent; border:1px solid var(--line); padding:10px 26px; font-size:13px; letter-spacing:.1em; color:var(--dim); }
+  .btn-ghost:hover{ border-color:var(--gold); color:var(--kinari); }
+
+  /* 質問 */
+  .progress{ display:flex; align-items:center; gap:12px; margin-bottom:26px; font-size:12px; letter-spacing:.14em; color:var(--dim); }
+  .bar{ flex:1; height:2px; background:rgba(214,182,128,.18); overflow:hidden; }
+  .bar span{ display:block; height:100%; width:0; background:var(--gold); transition:width .35s ease; }
+  .q-text{ font-family:'Shippori Mincho',serif; font-size:19px; line-height:1.8; margin:0 0 24px; color:var(--kinari); word-break:auto-phrase; }
+  .options{ display:grid; gap:10px; }
+  .opt{ width:100%; text-align:left; font-size:15px; line-height:1.7; padding:15px 16px; border:1px solid var(--line); background:var(--panel); transition:border-color .15s ease, background .15s ease, transform .1s ease; }
+  .opt:hover{ border-color:var(--gold); }
+  .opt:active, .opt.picked{ border-color:var(--gold); background:rgba(214,182,128,.16); transform:scale(.995); }
+  .back-row{ margin-top:22px; text-align:center; min-height:38px; }
+
+  /* 視ている間 */
+  .seeing{ text-align:center; padding:70px 0 40px; }
+  .seeing .ring{ width:96px; height:96px; margin:0 auto 26px; border-radius:50%; border:2px solid var(--kinari); display:flex; align-items:center; justify-content:center; font-family:'Shippori Mincho',serif; font-weight:700; font-size:34px; animation:glow 1.5s ease-in-out 5; }
+  @keyframes glow{ 0%,100%{ box-shadow:0 0 0 rgba(214,170,98,0); } 50%{ box-shadow:0 0 34px 6px rgba(214,170,98,.45); } }
+  .seeing p{ font-family:'Shippori Mincho',serif; font-size:16px; letter-spacing:.14em; color:var(--gold); }
+
+  /* 結果 */
+  .result-label{ text-align:center; font-size:13px; letter-spacing:.16em; color:var(--dim); margin:0 0 12px; }
+  .result-type{ font-family:'Shippori Mincho',serif; font-size:34px; font-weight:700; letter-spacing:.14em; text-align:center; color:var(--kinari); margin:0 0 12px; text-shadow:0 0 22px rgba(214,170,98,.4); }
+  .result-name{ text-align:center; margin:0 0 22px; }
+  .result-name span{ display:inline-block; font-size:13px; letter-spacing:.12em; padding:4px 14px; border:1px solid var(--gold); color:var(--gold); }
+  .why{ font-family:'Shippori Mincho',serif; font-size:14px; line-height:2; text-align:center; color:var(--dim); margin:0 0 22px; word-break:auto-phrase; }
+  .word{ font-family:'Shippori Mincho',serif; font-size:17px; line-height:1.9; text-align:center; margin:0 0 28px; padding:0 6px; white-space:pre-line; word-break:auto-phrase; text-wrap:balance; }
+  .card{ border:1px solid var(--line); background:var(--panel); padding:22px 18px; margin-bottom:14px; }
+  .card p{ margin:0 0 14px; font-size:15px; line-height:2; word-break:auto-phrase; }
+  .card p:last-child{ margin-bottom:0; }
+  .card h2{ font-family:'Shippori Mincho',serif; font-size:14px; font-weight:700; letter-spacing:.18em; color:var(--gold); margin:0 0 12px; padding-left:10px; border-left:3px solid var(--gold); }
+  .card.step{ border-color:var(--gold); }
+  .invite{ margin-top:34px; text-align:center; }
+  .invite p{ font-family:'Shippori Mincho',serif; font-size:15px; line-height:2.1; margin:0 0 20px; }
+  .invite .note{ font-family:inherit; font-size:12px; color:var(--dim); margin-top:12px; }
+  .again{ margin-top:30px; text-align:center; }
+  footer{ margin-top:46px; text-align:center; font-size:11px; line-height:1.9; color:var(--dim); }
+</style>
+</head>
+<body>
+<div class="noren" aria-hidden="true"><div class="rod"></div><div class="cloth"><div></div><div><span class="shichi">質</span></div><div></div></div><div class="lamp"></div></div>
+<div class="wrap">
+
+  <!-- 入口 -->
+  <section class="screen active" id="screen-intro">
+    <h1>七緒の眼識診断</h1>
+    <p class="subtitle">あんたが、気づかないうちに<br>こぼしているものは？</p>
+    <p class="lead">
+      持っている物は、あんたにもちゃんとある。<br>
+      ただ、どこかでこぼれているの。<br>
+      8つ答えなさい。1分で終わるわ。<br><br>
+      深く考えなくていい。<br>いちばん近いと思ったものを選びなさい。
+    </p>
+    <div class="center">
+      <button class="btn-main" id="startBtn" type="button">はじめる</button>
+    </div>
+  </section>
+
+  <!-- 質問 -->
+  <section class="screen" id="screen-quiz">
+    <div class="progress">
+      <span id="progressText">1 / 8</span>
+      <div class="bar"><span id="progressBar"></span></div>
+    </div>
+    <h2 class="q-text" id="qText"></h2>
+    <div class="options" id="options"></div>
+    <div class="back-row">
+      <button class="btn-ghost" id="backBtn" type="button">ひとつ前に戻る</button>
+    </div>
+  </section>
+
+  <!-- 視ている間 -->
+  <section class="screen" id="screen-seeing">
+    <div class="seeing"><div class="ring">質</div><p id="seeingText">視ているわ……</p></div>
+  </section>
+
+  <!-- 結果 -->
+  <section class="screen" id="screen-result">
+    <p class="result-label">あんたのタイプは</p>
+    <h1 class="result-type" id="resultType"></h1>
+    <p class="result-name"><span id="resultName"></span></p>
+    <p class="why" id="resultWhy"></p>
+    <p class="word" id="resultWord"></p>
+
+    <div class="card" id="resultBody"></div>
+
+    <div class="card">
+      <h2>それは、持ち前の裏よ</h2>
+      <p id="resultInner"></p>
+    </div>
+
+    <div class="card step">
+      <h2>今日の一つ</h2>
+      <p id="resultStep"></p>
+    </div>
+
+    <div class="invite">
+      <p>
+        ここまでは、同じ答え方をした人<br>みんなに言える話よ。<br><br>
+        あんた一人の持ち前が何で、<br>
+        どこで、どれだけこぼれているのか。<br>
+        ちゃんと視てほしいなら、LINEにいらっしゃい。
+      </p>
+      <a class="btn-main" id="lineBtn" href="#" target="_blank" rel="noopener">LINEで視てもらう</a>
+      <p class="note" id="lineNote" hidden>LINEは準備中よ。もう少し待ってなさい。</p>
+    </div>
+
+    <div class="again">
+      <button class="btn-ghost" id="retryBtn" type="button">もう一度やる</button>
+    </div>
+  </section>
+
+  <footer>
+    この診断は、今の気持ちの傾向を知るための読みものです。<br>
+    医療や専門家への相談の代わりにはなりません。
+  </footer>
+</div>
+
+<script>
+/* ====== 設定：七緒の公式LINEができたら、ここに入れる ======
+   LINE_ID  : 公式LINEのID（@から始まるもの。例 "@abc1234x"）
+              入れると、結果の言葉が入力された状態でトーク画面が開く
+   LINE_URL : 友だち追加のURL。LINE_ID が空の時だけ使う
+   どちらも空の時は「LINEは準備中」と出る */
+const LINE_ID = "";
+const LINE_URL = "";
+const KEYWORD = { a:"合鍵", b:"しまい着物", c:"封じ文", d:"埋もれた逸品", e:"柱時計" };
+
+/* ====== 質問（a=時間と手 / b=自分の分 / c=本音 / d=自分の値打ち / e=落ち着き） ====== */
+const QUESTIONS = [
+  { q: "夜、布団に入ってから頭に浮かぶのは？",
+    o: { a:"明日やると引き受けた、人の用事",
+         b:"今月も、自分の物を買うのを見送ったこと",
+         c:"今日、言いかけて飲み込んだ一言",
+         d:"画面で見た、だれかのうまくいっている暮らし",
+         e:"まだ起きていない、この先の心配" } },
+  { q: "「ちょっとお願いがあるんだけど」と言われたら？",
+    o: { a:"中身を聞く前に「いいよ」と言っている",
+         b:"自分の予定をずらしてでも合わせる",
+         c:"本当は困るのに、困った顔をしない",
+         d:"「私でいいのかな」と思いながら引き受ける",
+         e:"頼みの中身より、断った後のことが気になる" } },
+  { q: "思っていなかったお金が、少し入ったら？",
+    o: { a:"だれかに頼まれていた物に回す",
+         b:"家の足りない物に回して、自分の分は買わない",
+         c:"欲しい物はあるけれど、家の人には言わない",
+         d:"自分に使っていいのか迷って、そのままにする",
+         e:"何かあった時のために、手をつけずに取っておく" } },
+  { q: "人と話していて、よくあるのは？",
+    o: { a:"気づくと聞き役で、自分の話はしていない",
+         b:"「私は大丈夫」と先に言っている",
+         c:"言いたいことの半分も言っていない",
+         d:"相手の話を聞きながら、自分と比べている",
+         e:"話の途中で、悪いほうの想像をしている" } },
+  { q: "疲れている日の夜、やってしまうのは？",
+    o: { a:"頼まれていたことを、無理して片づける",
+         b:"家のことを全部済ませてから、やっと座る",
+         c:"「疲れた」と言わずに、いつもどおりにふるまう",
+         d:"人の投稿を眺めて、よけいに疲れる",
+         e:"明日の段取りを、何度も頭の中でなぞる" } },
+  { q: "ほめられた時、あんたは？",
+    o: { a:"「またお願いね」が続くのが分かって、少し身構える",
+         b:"ほめ言葉より、まだ残っている家のことが気になる",
+         c:"うれしいのに、うまく顔に出せない",
+         d:"「大したことしてないよ」と、すぐ打ち消す",
+         e:"次にがっかりさせないか、心配になる" } },
+  { q: "休みの日が、まる一日空いたら？",
+    o: { a:"だれかの用事が入るのを、どこかで待っている",
+         b:"たまった家のことを片づけて、一日が終わる",
+         c:"本当は一人でいたいのに、誘われたら断れない",
+         d:"やりたいことはあるけれど、「私なんか」と動かない",
+         e:"何をしていても、来週の心配が頭から離れない" } },
+  { q: "これから先、いちばん欲しいのは？",
+    o: { a:"自分のためだけに使える時間",
+         b:"値段を見ずに、自分の物を選べる日",
+         c:"思ったことを、そのまま言える相手",
+         d:"「私にもできる」という手ごたえ",
+         e:"先のことを考えても、ぐっすり眠れる夜" } }
+];
+
+/* ====== 結果 ====== */
+const RESULTS = {
+  a: { type:"合鍵", name:"時間と手",
+       why:"合鍵は、持っている人ならだれでも戸を開けられる。あんたの時間と手も、今はだれでも使えるようになっているの。",
+       word:"あんたの一日は、人の用事で埋まっているわね。",
+       body:[
+         "頼まれると断らない。中身を聞く前に「いいよ」が出る。そうやって引き受けた用事が、あんたの時間と手を、毎日少しずつ持っていくの。気づけば、自分のための時間は、一日の終わりの残りだけになっている。",
+         "これは、あんたのせいじゃないわ。断らない人の所に、用事は集まるものよ。頼む側は、あんたが無理をしているとは思っていない。だから減らせるのは、引き受ける側のあんただけなの。" ],
+       inner:"あんたには、人に頼られるだけの確かさがある。任された物を投げ出さない人だから、みんな安心して預けてくるのよ。その確かさを、自分の用事にも使っていいの。",
+       step:"今日、何か頼まれたら、すぐに「いいよ」と言わずに「ちょっと確かめてから返事するね」と言いなさい。引き受けるかどうかは、そのあとで決めればいいわ。" },
+  b: { type:"しまい着物", name:"自分の分",
+       why:"いい着物ほど、汚すのがもったいなくて、たんすにしまったままになる。あんたは、自分の分をそうやってしまい込んでいるの。",
+       word:"家の中で、あんたの分がいちばん後ね。",
+       body:[
+         "家の物は買う。人の物も買う。自分の物だけ「今月はいいか」と見送る。座るのは、家のことが全部済んでから。そうやって後に回した分が、何年も積もっているの。",
+         "これは、あんたのせいじゃないわ。家を回す人ほど、自分を最後に数える癖がつく。だれかにそう言われたわけではなくても、家の中でいちばん支えている人には、自然とそうなるのよ。" ],
+       inner:"あんたは、家の足りない物にすぐ気づける人よ。人の暮らしを見て、先に手を打てる。その目を一度だけ、自分の暮らしにも向けなさい。自分の足りない物にも、同じように気づけるはずよ。",
+       step:"今日、自分のための物を一つだけ選びなさい。高い物でなくていいわ。選ぶ時に、心の中で「これは私の分」と言うこと。" },
+  c: { type:"封じ文", name:"本音",
+       why:"書いたのに、封をしたまま出さなかった手紙。あんたの中には、そういう言葉がたくさんしまってあるの。",
+       word:"言いかけてやめた言葉、いくつ抱えてるの。",
+       body:[
+         "本当は困っている。本当は疲れている。本当は一人でいたい。でも、それを顔に出さずに、いつもどおりにふるまう。飲み込んだ言葉は消えずに、夜、布団に入ってから出てくるの。",
+         "これは、あんたのせいじゃないわ。波を立てないほうがほめられる場所に長くいると、本音は先に引っ込めるのが当たり前になる。あんたは、その場を守るために黙ってきたのよ。" ],
+       inner:"あんたは、人の気持ちの小さな変わり目に気づける人よ。だからこそ、相手を困らせない言い方を、いつも先に探してしまう。その細かさは、本音を上手に伝えるためにも使えるわ。",
+       step:"今日、どうでもいい小さなことで、「私はこっちがいい」を一回だけ言いなさい。お昼に何を食べるか、くらいでいいの。" },
+  d: { type:"埋もれた逸品", name:"自分の値打ち",
+       why:"値打ちのある品ほど、蔵の奥で埃をかぶっていると、だれにも気づかれない。持ち主のあんたにもね。",
+       word:"人のことはほめるのに、自分のことは数えないのね。",
+       body:[
+         "ほめられると、すぐ「大したことしてないよ」と打ち消す。人の暮らしを見ると、自分には何もないように思える。やってきたことはたくさんあるのに、一度もそれを数えたことがないの。",
+         "これは、あんたのせいじゃないわ。当たり前のようにやってきた人ほど、それを頑張りだと思えないものよ。人は、うまくいっている所だけを並べて見せる。数えていない自分と比べたら、空っぽに見えて当たり前なの。" ],
+       inner:"あんたは、人の良い所にすぐ気づいて、ちゃんとほめられる人よ。人の値打ちが見える目は、もう持っている。その目を、まだ一度も自分に向けたことがないのよ。",
+       step:"今日、だれかに「ありがとう」「助かった」と言われたら、打ち消さずに「どういたしまして」とだけ返しなさい。落ち着かなくても、それでいいわ。" },
+  e: { type:"柱時計", name:"落ち着き",
+       why:"柱時計は、夜中もずっと動き続ける。あんたの頭の中では、先の心配がそうやって休まず動いているの。",
+       word:"まだ起きていないことに、今日を使っているわね。",
+       body:[
+         "もしもの時を考えて、お金に手をつけない。明日の段取りを、何度も頭の中でなぞる。話していても、悪いほうの想像が先に浮かぶ。そうやって、起きてもいないことを毎日先に体験しているから、あんたの落ち着きはすり減っていくの。",
+         "これは、あんたのせいじゃないわ。用心しないと困る日を何度もくぐってきた人ほど、先回りの心配が体に残る。あんたが大きくつまずかずにここまで来られたのは、その用心のおかげでもあるのよ。" ],
+       inner:"あんたは、先のことを考えられる人よ。悪いほうを思い描ける人は、良いほうも思い描ける。その力を、心配だけに使うのはもったいないわ。",
+       step:"気になっていることを一つ紙に書いて、今日できることが一つでもあるかだけ確かめなさい。なければ、今夜はその紙ごと置いておいていいわ。" }
+};
+
+const ORDER = ["a","b","c","d","e"];
+let current = 0;
+let answers = [];
+let shuffled = [];
+
+const $ = id => document.getElementById(id);
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({ top:0, behavior:"auto" });
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start(){
+  current = 0;
+  answers = [];
+  shuffled = QUESTIONS.map(() => shuffle(ORDER));
+  show("screen-quiz");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const item = QUESTIONS[current];
+  $("progressText").textContent = (current + 1) + " / " + QUESTIONS.length;
+  $("progressBar").style.width = (current / QUESTIONS.length * 100) + "%";
+  $("qText").textContent = item.q;
+  $("backBtn").style.visibility = current === 0 ? "hidden" : "visible";
+  const box = $("options");
+  box.innerHTML = "";
+  shuffled[current].forEach(key => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt" + (answers[current] === key ? " picked" : "");
+    b.textContent = item.o[key];
+    b.addEventListener("click", () => pick(key, b));
+    box.appendChild(b);
+  });
+}
+
+function pick(key, btn){
+  answers[current] = key;
+  btn.classList.add("picked");
+  setTimeout(() => {
+    if(current < QUESTIONS.length - 1){ current++; renderQuestion(); }
+    else{ seeing(); }
+  }, 180);
+}
+
+function back(){
+  if(current > 0){ current--; renderQuestion(); }
+}
+
+/* いちばん多く選んだもの。同点は Q8 → Q1 → a,b,c,d,e の順で決める */
+function decide(){
+  const score = { a:0, b:0, c:0, d:0, e:0 };
+  answers.forEach(k => { score[k]++; });
+  const max = Math.max(...ORDER.map(k => score[k]));
+  const top = ORDER.filter(k => score[k] === max);
+  if(top.length === 1) return top[0];
+  const last = answers[answers.length - 1];
+  if(top.includes(last)) return last;
+  if(top.includes(answers[0])) return answers[0];
+  return top[0];
+}
+
+/* 結果の前に、少し間を置く（視ている間） */
+function seeing(){
+  show("screen-seeing");
+  const t = $("seeingText");
+  t.textContent = "視ているわ……";
+  setTimeout(() => { t.textContent = "あんたの手もとが、視えてきた。"; }, 3750);
+  setTimeout(showResult, 7500);
+}
+
+function showResult(){
+  const key = decide();
+  const r = RESULTS[key];
+  setupLine(key);
+  $("resultType").textContent = r.type;
+  $("resultName").textContent = "こぼしているもの　" + r.name;
+  $("resultWhy").textContent = r.why;
+  $("resultWord").textContent = r.word.replace(/。(?=.)/g, "。" + String.fromCharCode(10));
+  $("resultBody").innerHTML = "";
+  r.body.forEach(t => { const p = document.createElement("p"); p.textContent = t; $("resultBody").appendChild(p); });
+  $("resultInner").textContent = r.inner;
+  $("resultStep").textContent = r.step;
+  show("screen-result");
+}
+
+function setupLine(key){
+  const btn = $("lineBtn");
+  const note = $("lineNote");
+  btn.removeAttribute("aria-disabled");
+  if(LINE_ID){
+    btn.href = "https://line.me/R/oaMessage/" + encodeURIComponent(LINE_ID) + "/?" + encodeURIComponent(KEYWORD[key]);
+    note.textContent = "「" + KEYWORD[key] + "」と入った画面が開くわ。そのまま送りなさい。";
+    note.hidden = false;
+  }else if(LINE_URL){
+    btn.href = LINE_URL;
+    note.hidden = true;
+  }else{
+    btn.setAttribute("aria-disabled", "true");
+    btn.removeAttribute("href");
+    note.hidden = false;
+  }
+}
+
+$("startBtn").addEventListener("click", start);
+$("backBtn").addEventListener("click", back);
+$("retryBtn").addEventListener("click", () => show("screen-intro"));
+</script>
+</body>
+</html>
