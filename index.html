@@ -183,6 +183,19 @@
    どちらも空の時は「LINEは準備中」と出る */
 const LINE_ID = "";
 const LINE_URL = "https://line.me/R/ti/p/%40370lvxij";
+/* ====== 数を数える：Googleスプレッドシートの記録用URL（Apps Script のウェブアプリ）を入れる ======
+   空の時は何も送らない。送るのは「開いた・始めた・終えた（タイプ）・LINEを押した」と時刻だけ。名前や答えの中身は送らない */
+const COUNT_URL = "https://script.google.com/macros/s/AKfycbxPLiLNWN-R6bWfq5KNOzNFlb7nQ6s7jA1qAzq-D4R3lMh5avG04PeF8dR3GBZQ592C/exec";
+function count(ev, type){
+  if(!COUNT_URL) return;
+  try{
+    const body = JSON.stringify({ ev:ev, type:type || "", ref:document.referrer || "" });
+    if(navigator.sendBeacon) navigator.sendBeacon(COUNT_URL, body);
+    else fetch(COUNT_URL, { method:"POST", body:body, mode:"no-cors", keepalive:true });
+  }catch(e){}
+}
+count("open");
+
 const KEYWORD = { a:"合鍵", b:"しまい着物", c:"封じ文", d:"埋もれた逸品", e:"柱時計" };
 
 /* ====== 質問（a=時間と手 / b=自分の分 / c=本音 / d=自分の値打ち / e=落ち着き） ====== */
@@ -304,6 +317,7 @@ function shuffle(arr){
 }
 
 function start(){
+  count("start");
   current = 0;
   answers = [];
   shuffled = QUESTIONS.map(() => shuffle(ORDER));
@@ -368,6 +382,7 @@ function showResult(){
   const key = decide();
   const r = RESULTS[key];
   setupLine(key);
+  count("finish", KEYWORD[key]);
   $("resultType").textContent = r.type;
   $("resultName").textContent = "こぼしているもの　" + r.name;
   $("resultWhy").textContent = r.why;
@@ -398,6 +413,7 @@ function setupLine(key){
 }
 
 $("startBtn").addEventListener("click", start);
+$("lineBtn").addEventListener("click", () => { const k = $("resultType").textContent; count("line", k); });
 $("backBtn").addEventListener("click", back);
 $("retryBtn").addEventListener("click", () => show("screen-intro"));
 </script>
